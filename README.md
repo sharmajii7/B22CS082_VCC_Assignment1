@@ -25,27 +25,27 @@ This project demonstrates the deployment of a simple microservice-based applicat
 
 To enable communication between the VMs, we will configure a NAT Network in VirtualBox. Below are the steps to set it up:
 
-#### 1. Create a NAT Network in VirtualBox
-1. Open VirtualBox and go to `File > Preferences`.
-2. Navigate to the `Network` section and click on the `NAT Networks` tab.
-3. Click the `+` icon to add a new NAT Network.
-4. Configure the NAT Network:
-   - Name: `NATNetwork` (or any preferred name).
-   - Subnet: `192.168.100.0/24`.
-   - Ensure the `Supports DHCP` option is **enabled**.
-5. Save the configuration.
+1. Create a NAT Network in VirtualBox
+   1. Open VirtualBox and go to `File > Preferences`.
+   2. Navigate to the `Network` section and click on the `NAT Networks` tab.
+   3. Click the `+` icon to add a new NAT Network.
+   4. Configure the NAT Network:
+      - Name: `NATNetwork` (or any preferred name).
+      - Subnet: `192.168.100.0/24`.
+      - Ensure the `Supports DHCP` option is **enabled**.
+   5. Save the configuration.
 
-#### 2. Attach Each VM to the NAT Network
-1. Select a VM in VirtualBox and click on `Settings`.
-2. Go to the `Network` tab.
-3. For `Adapter 1`:
-   - Enable the network adapter.
-   - Set `Attached to` as `NAT Network`.
-   - Select the NAT Network you created (e.g., `NATNetwork`).
-4. Click `OK`.
-5. Repeat these steps for all VMs.
+2. Attach Each VM to the NAT Network
+   1. Select a VM in VirtualBox and click on `Settings`.
+   2. Go to the `Network` tab.
+   3. For `Adapter 1`:
+      - Enable the network adapter.
+      - Set `Attached to` as `NAT Network`.
+      - Select the NAT Network you created (e.g., `NATNetwork`).
+   4. Click `OK`.
+   5. Repeat these steps for all VMs.
 
-#### 3. Following are the IP addresses that get assigned to the VMs:
+3. Following are the IP addresses that get assigned to the VMs:
    * **VM1**: `192.168.100.4`
    * **VM2**: `192.168.100.5`
    * **VM3**: `192.168.100.6`
