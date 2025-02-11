@@ -25,9 +25,9 @@ This project demonstrates the deployment of a simple microservice-based applicat
 
 1. Set up an **Internal Network** in VirtualBox for all VMs
 2. Assign static IP addresses to the VMs as follows:
-   * **VM1**: `192.168.1.101`
-   * **VM2**: `192.168.1.102`
-   * **VM3**: `192.168.1.103`
+   * **VM1**: `192.168.100.4`
+   * **VM2**: `192.168.100.5`
+   * **VM3**: `192.168.100.6`
 
 ### 2. Backend Setup on VM1
 
@@ -39,35 +39,47 @@ This project demonstrates the deployment of a simple microservice-based applicat
 
 2. Create the backend application:
    ```bash
-   mkdir backend && cd backend
+   mkdir microservice && cd microservice
    npm init -y
-   npm install express mongoose pm2
+   npm install express mongoose
    ```
 
 3. Backend Code (`index.js`):
    ```javascript
-   const express = require('express');
-   const mongoose = require('mongoose');
-   const app = express();
-
-   mongoose.connect('mongodb://192.168.1.102:27017/testdb', {
-     useNewUrlParser: true,
-     useUnifiedTopology: true
-   });
-
-   app.get('/api/hello', async (req, res) => {
-     const data = await mongoose.connection.db.collection('test').findOne({});
-     res.json({ message: data.message || 'Hello from the backend!' });
-   });
-
-   app.listen(3000, () => {
-     console.log('Server running on port 3000');
-   });
+    const express = require('express'); 
+    const mongoose = require('mongoose'); 
+    const app = express(); 
+    const PORT = process.env. PORT || 3000; 
+    
+    // Connect to MongoDB (hostel on VM2) 
+    mongoose.connect('mongodb://198.168.100.5:27017/mydb', { 
+            useNewUrlParser: true, 
+            useUnified Topology: true 
+    }).then(() => { 
+            console.log('Connected to MongoDB'); 
+    }).catch(err => { 
+            console.error('MongoDB connection error:', err); 
+    }); 
+    
+    app.use (express.json()); 
+    
+    app.get('/api/hello', async (req, res) => { 
+            try { 
+                    const data = await mongoose.connection.db.collection('test').findOne({}); 
+                    res.json({ message: data.message }); 
+            } catch (err) { 
+                    res.status(500).json({ error: 'Database error' }); 
+            } 
+    }); 
+    
+    app.listen(PORT, () => { 
+            console.log(Service running on port ${PORT}); 
+    });
    ```
 
 4. Start the backend using PM2:
    ```bash
-   pm2 start index.js
+   node index.js
    ```
 
 ### 3. MongoDB Setup on VM2
@@ -75,7 +87,21 @@ This project demonstrates the deployment of a simple microservice-based applicat
 1. Install MongoDB:
    ```bash
    sudo apt update
-   sudo apt install -y mongodb
+   
+   sudo apt-get install gnupg curl
+   curl -fsSL https://www.mongodb.org/static/pgp/server-8.0.asc | \
+   sudo gpg -o /usr/share/keyrings/mongodb-server-8.0.gpg \
+   --dearmor
+
+   echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-8.0.gpg ] \
+   https://repo.mongodb.org/apt/ubuntu noble/mongodb-org/8.0 multiverse" | \
+   sudo tee /etc/apt/sources.list.d/mongodb-org-8.0.list
+
+   sudo apt-get update
+
+   sudo apt-get install -y mongodb-org
+
+   sudo systemctl start mongod
    ```
 
 2. Allow external connections by editing `/etc/mongod.conf`:
@@ -85,13 +111,13 @@ This project demonstrates the deployment of a simple microservice-based applicat
 
    Restart MongoDB:
    ```bash
-   sudo systemctl restart mongodb
+   sudo systemctl restart mongod
    ```
 
 3. Insert sample data:
    ```bash
-   mongo
-   use testdb
+   mongosh
+   use mydb
    db.test.insertOne({ message: 'Hello from MongoDB!' });
    ```
 
@@ -105,7 +131,7 @@ This project demonstrates the deployment of a simple microservice-based applicat
 
 2. Test the backend by sending a request:
    ```bash
-   curl http://192.168.1.101:3000/api/hello
+   curl http://192.168.100.4:3000/api/hello
    ```
 
 3. You should receive the following response:
@@ -114,11 +140,5 @@ This project demonstrates the deployment of a simple microservice-based applicat
      "message": "Hello from MongoDB!"
    }
    ```
-
-## Future Improvements
-
-* Add a frontend application for better interaction
-* Deploy the microservices in a containerized environment using Docker
-* Scale the system using a load balancer
 
 Feel free to fork and enhance the project!
