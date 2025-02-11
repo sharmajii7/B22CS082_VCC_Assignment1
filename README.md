@@ -77,7 +77,7 @@ This project demonstrates the deployment of a simple microservice-based applicat
     });
    ```
 
-4. Start the backend using PM2:
+4. Start the backend:
    ```bash
    node index.js
    ```
